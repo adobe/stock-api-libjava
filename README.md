@@ -995,3 +995,122 @@ public static void main(String[] args) {
 }
 
 ```
+### Entitlements List and Switch Accounts
+##### Entitlements List
+Entitlements List API lists the available entitlement for an account.
+For selecting the user to use for the data, it needs to accept either:
+
+* a user token
+* a service token and a query parameter named entity_ref - so it needs to contain the full string including the @ symbol
+The endpoint should be named /Entitlement/1/Entitlement/List and should be available through adobe.io only
+
+##### Switch Accounts
+Select Entitlement API allows the selection of the current active entitlement for an account.
+For selecting the user to use for the data, it needs to accept either:
+* a user token
+* a service token and a POST parameter named entity_ref - so it needs to contain the full string including the @ symbol
+* entitlement_guid: Optional When not set, user's personal entitlement is selected
+The endpoint should be named /Entitlement/1/Entitlement/Select, reachable through POST method and should be available through adobe.io only
+
+#### Instantiation
+You can construct the object of this class with below arguments -
+* Requires:
+     * `config` - the stock configuration object of `StockConfig` type.
+
+* Returns:
+    * `EntitlementList` - The response object containing the stock user guid, creation date, list of organizations and list of entitlements within the organizations returned by `listEntitlements` method.
+    
+    `SelectEntitlement` returns no response after selecting or switching the account, if no guid is mentioned, personal entitlement would be selected.
+
+#### Entitlement List Response
+After calling  APIs in `Entitlements` class, response is returned in the form of `Entitlement List`. It contains following fields. All class objects used in response are defined below.
+
+|Parameter| Getter Methods | Related Class     |Description|
+|---|---|---|---|
+|guid |getGuid||Stock users AdobeId.|
+|creation_date|getCreationDate||Get account Creation Date|
+|organizations|getOrganizations|EntitlementOrganization|Get List of Entitlement Organizations. See EntitlementOrganization|
+|entitlements|getEntitlements|Entitlement|List of entitlements in each organization. See Entitlement|
+
+##### EntitlementOrganization
+Listing of the entitlement organization for an account.
+   * `id` Organization Id.
+   * `Name` Organization Name
+   * `Entitlements` List of Entitlements within the organization
+
+##### Entitlement
+Listing of the available entitlement for an account within the organizations.
+
+   * `entitlement_id` Entitlement Id.
+   * `Label` Entitlement Label.
+   * `guid` Stock user id.
+   * `creation` Entitlement Creation Date.
+   * `nb_active_allotments` Number of active allotments.
+   * `licenses_available` Number of Licenses Available.
+   * `licenses_used` Number of Licenses used.
+   * `has_overage`Boolean flag for Overage.
+   * `is_default_entitlement` Check for default entitlement of feature flag is on.
+   * `suspend_date` Entitlement Suspend Date.
+   
+#### Methods
+   * `listEntitlements` Returns list of all entitlement for an account. Api needs either access token or service token and entity refernce for the same.
+   * `selectEntitlement` It selects entitlement from the list of avaialble entitlements depending on the entitlementGuid, if entitlementGuid is not passsed, personal entitlement would be selected.
+   
+#### Examples 
+
+##### List Entitlement
+
+``` Java
+public static void main(String args[]) {
+        try {
+            //Valid access token for stock files.
+            String accessToken = "Ims Token";
+        
+            //Initialize config
+            StockConfig config = new StockConfig()
+                    .setApiKey("AdobeStockClient1")
+                    .setProduct("Adobe Stock Lib/1.0.0");
+            
+            //Initializing api
+            Entitlements api = new Entitlements(config);
+            
+            //calling list entitlements method
+            EntitlementList response = api.listEntitlements(accessToken, null);
+            
+            System.out.println("Entitlement List Response:");
+            print("Entitlement Organization Id:",response.getOrganizations().get(0).getId());
+            print("Entitlement Id", response.getOrganizations().get(0).getEntitlements().get(0).getEntitlementId());
+        } catch (Exception e) {
+            throw new StockException("error in entitlement api");
+        }
+}
+```
+
+##### Select Entitlement
+```  Java
+public static void main(String args[]) {
+        try {
+            //Valid access token for stock files.
+            String accessToken = "Ims Token";
+        
+            //Initialize config
+            StockConfig config = new StockConfig()
+                    .setApiKey("AdobeStockClient1")
+                    .setProduct("Adobe Stock Lib/1.0.0");
+            
+            //Initializing api
+            Entitlements api = new Entitlements(config);
+            
+            //calling list entitlements method
+            String guid = response.getOrganizations().get(0).getEntitlements().get(0).getEntitlementId();
+            EntitlementList response = api.listEntitlements(accessToken, null);
+            
+            //select one entitlement (switch account) from the lisst
+            api.selectEntitlement(accessToken, guid, "");
+            
+            System.out.println("Entitlement has been selected");
+        } catch (Exception e) {
+            throw new StockException("error in entitlement select api");
+        
+}
+```

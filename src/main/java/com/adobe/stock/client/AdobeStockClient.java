@@ -9,6 +9,7 @@ package com.adobe.stock.client;
 
 import java.util.ArrayList;
 
+import com.adobe.stock.apis.Entitlements;
 import com.adobe.stock.apis.License;
 import com.adobe.stock.apis.LicenseHistory;
 import com.adobe.stock.apis.SearchCategory;
@@ -26,6 +27,7 @@ import com.adobe.stock.models.LicenseResponse;
 import com.adobe.stock.models.SearchCategoryRequest;
 import com.adobe.stock.models.SearchFilesRequest;
 import com.adobe.stock.models.SearchFilesResponse;
+import com.adobe.stock.models.EntitlementList;
 import com.adobe.stock.models.LicenseHistoryRequest;
 import com.adobe.stock.models.SearchParametersLicenseHistory;
 import com.adobe.stock.models.LicenseHistoryResponse;
@@ -197,6 +199,38 @@ public class AdobeStockClient {
         }
     }
 
+    public static void testListEntitlements() throws StockException{
+        try{
+            String accessToken = "eyJ4NXUiOiJpbXNfbmExLXN0ZzEta2V5LTEuY2VyIiwiYWxnIjoiUlMyNTYifQ.eyJmZyI6IlJRM1NWNlI0NDNURVA1UlQ1UVMzT0dZQVc0PT09PT09IiwiYyI6IlZIeDBWemdwcmxLdEoyS01qb1AvbFE9PSIsIm1vaSI6ImFiMjQyOGM3IiwiY3JlYXRlZF9hdCI6IjE0OTgwMzQ1NTg3OTIiLCJ0eXBlIjoiYWNjZXNzX3Rva2VuIiwiY2xpZW50X2lkIjoiQWRvYmVTdG9ja0NsaWVudDIiLCJzaWQiOiIxNDk4MDM0NTA4MzA2LTIzMDBkODE2LTg3ZmEtNGY4YS1hNjI0LTAxNzFiMWUzMzllZSIsImFzIjoiaW1zLW5hMS1zdGcxIiwidXNlcl9pZCI6IjRFRDM5OTQ2NTkzNjg2RDcwQTQ5NDIyMUBBZG9iZUlEIiwic2NvcGUiOiJBZG9iZUlELG9wZW5pZCxjcmVhdGl2ZV9jbG91ZCxjcmVhdGl2ZV9zZGssY2NfcHJpdmF0ZSxnbmF2LHNhby5zdG9jayxhZGRpdGlvbmFsX2luZm8uYWRkcmVzcy5tYWlsX3RvLGFkZGl0aW9uYWxfaW5mby5kb2IscmVhZF9vcmdhbml6YXRpb25zLHJlYWRfcGMuc3RvY2sscmVhZF9wYy5zdG9ja19jcmVkaXRzLGFkZGl0aW9uYWxfaW5mby5yb2xlcyxzYW8uY2NlX3ByaXZhdGUiLCJpZCI6IjE0OTgwMzQ1NTg3OTItNDc3ZDk4YTItYmU5NC00MjMwLWFkZWYtYmNhNWVkMmNmZWI0Iiwic3RhdGUiOiJ7XCJhY1wiOlwic3RvY2suYWRvYmUuY29tXCIsXCJhdlwiOm51bGwsXCJkaVwiOm51bGwsXCJtY1wiOm51bGwsXCJwbFwiOm51bGx9IiwiZXhwaXJlc19pbiI6Ijg2NDAwMDAwIn0.Tf6m1Xlvv-o72CPt_QVMbrNOvStdgPMcNaHbSrkQ-nAiC0X7XxDGQsn-7E8Di_bc6KFa7I3Fy3VY9DLzYbk8dMo_cntVZZwJJhVMsiv5eAGJitYK27TGRpmRS9bN3omaxTlRFVWfxKWmeW70r-5FqB6lJJ4JjTVW0HKhkDzO3cLqSqUbtl7vajbe9C4W1OHN9nxgrG01r6CDwBii8VBfuUYkVzHO7Mc5GncOZ7HvUtKoPcDarT8P6l1-UNjwfVYfd94f4kyYWZi9ha8pAVpLCwEnYut5JmOOdyyCP7xO_w2mtasQJZPecmSAwBqiWRnm4a1Plrp1389n5IpMSekhSQ";
+            StockConfig config = new StockConfig()
+                    .setApiKey("AdobeStockClient1")
+                    .setProduct("Adobe Stock Lib/1.0.0");
+            Entitlements api = new Entitlements(config);
+            EntitlementList response = api.listEntitlements(accessToken, null);
+            System.out.println("Entitlement List Response:");
+            print("Entitlement Organization Id:",response.getOrganizations().get(0).getId());
+            print("Entitlement Id", response.getOrganizations().get(0).getEntitlements().get(0).getEntitlementId());
+        } catch (Exception e) {
+            throw new StockException("error in entitlement api");
+        }
+    }
+
+    public static void testSelectEntitlement() throws StockException{
+        try{
+            String accessToken = "eyJ4NXUiOiJpbXNfbmExLXN0ZzEta2V5LTEuY2VyIiwiYWxnIjoiUlMyNTYifQ.eyJmZyI6IlJRM1NWNlI0NDNURVA1UlQ1UVMzT0dZQVc0PT09PT09IiwiYyI6IlZIeDBWemdwcmxLdEoyS01qb1AvbFE9PSIsIm1vaSI6ImFiMjQyOGM3IiwiY3JlYXRlZF9hdCI6IjE0OTgwMzQ1NTg3OTIiLCJ0eXBlIjoiYWNjZXNzX3Rva2VuIiwiY2xpZW50X2lkIjoiQWRvYmVTdG9ja0NsaWVudDIiLCJzaWQiOiIxNDk4MDM0NTA4MzA2LTIzMDBkODE2LTg3ZmEtNGY4YS1hNjI0LTAxNzFiMWUzMzllZSIsImFzIjoiaW1zLW5hMS1zdGcxIiwidXNlcl9pZCI6IjRFRDM5OTQ2NTkzNjg2RDcwQTQ5NDIyMUBBZG9iZUlEIiwic2NvcGUiOiJBZG9iZUlELG9wZW5pZCxjcmVhdGl2ZV9jbG91ZCxjcmVhdGl2ZV9zZGssY2NfcHJpdmF0ZSxnbmF2LHNhby5zdG9jayxhZGRpdGlvbmFsX2luZm8uYWRkcmVzcy5tYWlsX3RvLGFkZGl0aW9uYWxfaW5mby5kb2IscmVhZF9vcmdhbml6YXRpb25zLHJlYWRfcGMuc3RvY2sscmVhZF9wYy5zdG9ja19jcmVkaXRzLGFkZGl0aW9uYWxfaW5mby5yb2xlcyxzYW8uY2NlX3ByaXZhdGUiLCJpZCI6IjE0OTgwMzQ1NTg3OTItNDc3ZDk4YTItYmU5NC00MjMwLWFkZWYtYmNhNWVkMmNmZWI0Iiwic3RhdGUiOiJ7XCJhY1wiOlwic3RvY2suYWRvYmUuY29tXCIsXCJhdlwiOm51bGwsXCJkaVwiOm51bGwsXCJtY1wiOm51bGwsXCJwbFwiOm51bGx9IiwiZXhwaXJlc19pbiI6Ijg2NDAwMDAwIn0.Tf6m1Xlvv-o72CPt_QVMbrNOvStdgPMcNaHbSrkQ-nAiC0X7XxDGQsn-7E8Di_bc6KFa7I3Fy3VY9DLzYbk8dMo_cntVZZwJJhVMsiv5eAGJitYK27TGRpmRS9bN3omaxTlRFVWfxKWmeW70r-5FqB6lJJ4JjTVW0HKhkDzO3cLqSqUbtl7vajbe9C4W1OHN9nxgrG01r6CDwBii8VBfuUYkVzHO7Mc5GncOZ7HvUtKoPcDarT8P6l1-UNjwfVYfd94f4kyYWZi9ha8pAVpLCwEnYut5JmOOdyyCP7xO_w2mtasQJZPecmSAwBqiWRnm4a1Plrp1389n5IpMSekhSQ";
+            StockConfig config = new StockConfig()
+                    .setApiKey("AdobeStockClient1")
+                    .setProduct("Adobe Stock Lib/1.0.0");
+            Entitlements api = new Entitlements(config);
+            EntitlementList response = api.listEntitlements(accessToken, null);
+            String guid = response.getOrganizations().get(0).getEntitlements().get(0).getEntitlementId();
+            api.selectEntitlement(accessToken, guid, "");
+            System.out.println("Entitlement has been selected");
+        } catch (Exception e) {
+            throw new StockException("error in entitlement select api");
+        }
+    }
+    
     public static void print(String key, Object val) {
         System.out.println(key + " : " + val.toString());
     }

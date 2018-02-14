@@ -59,6 +59,16 @@ public class Endpoints {
     private static final String LICENSE_HISTORY_ENDPOINT_KEY =
             "api.endpoints.licensehistory";
     /**
+     * Properties file key for List Entitlement endpoint.
+     */
+    private static final String LIST_ENTITLEMENT_ENDPOINT_KEY =
+            "api.endpoints.entitlementlist";
+    /**
+     * Properties file key for select entitlement endpoint.
+     */
+    private static final String SELECT_ENTITLEMENT_ENDPOINT_KEY =
+            "api.endpoints.selectentitlement";
+    /**
      * Properties file name for prod environment.
      */
     private static final String PROPS_FILE_PROD = "prod-environment.properties";
@@ -197,6 +207,22 @@ public class Endpoints {
     public final String getLicenseHistoryEndpoint() {
         return this.mEndpoints.getProperty(
                 LICENSE_HISTORY_ENDPOINT_KEY);
+    }
+    /**
+     * Get the endpoint for entitlement list API.
+     * @return the endpoint for entitlement list sAPI
+     */
+    public final String getEntitlementListEndPoint() {
+        return this.mEndpoints.getProperty(
+                LIST_ENTITLEMENT_ENDPOINT_KEY);
+    }
+    /**
+     * Get the endpoint for select entitlement API.
+     * @return the endpoint for select entitlement API.
+     */
+    public final String getSelectEntitlementEndpoint() {
+        return this.mEndpoints.getProperty(
+                SELECT_ENTITLEMENT_ENDPOINT_KEY);
     }
     /**
      * Get the environment stack.
