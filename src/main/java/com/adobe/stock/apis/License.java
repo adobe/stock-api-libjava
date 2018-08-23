@@ -218,8 +218,8 @@ public final class License {
              responseString = HttpUtils.doGet(requestURL, headers);
         } else {
             String jsonString = JsonUtils.parseObjectToJson(
-                    request.getLicenseReference());
-             responseString = HttpUtils.doPost(requestURL, headers,
+                    request);
+            responseString = HttpUtils.doPost(requestURL, headers,
                     jsonString.getBytes(), ContentType.APPLICATION_JSON);
             }
 

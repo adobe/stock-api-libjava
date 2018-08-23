@@ -10,6 +10,8 @@ package com.adobe.stock.models;
 import com.adobe.stock.annotations.SearchParamURLMapperInternal;
 import com.adobe.stock.enums.AssetLicenseState;
 import com.adobe.stock.enums.AssetPurchaseState;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Request object : for licensing assets, for getting licensing information
@@ -69,6 +71,7 @@ public final class LicenseRequest {
     /**
      * @return Asset's unique identifer.
      */
+    @JsonIgnore
     public Integer getContentId() {
         return mContentId;
     }
@@ -97,6 +100,7 @@ public final class LicenseRequest {
      *         passed, field will be ignored while calling this api.</b>
      * @see AssetLicenseState
      */
+    @JsonIgnore
     public AssetLicenseState getLicenseState() {
         return mLicenseState;
     }
@@ -122,6 +126,7 @@ public final class LicenseRequest {
     /**
      * @return Location language code for the API.
      */
+    @JsonIgnore
     public String getLocale() {
         return mLocale;
     }
@@ -146,6 +151,7 @@ public final class LicenseRequest {
      *         AssetPurchaseState.
      * @see AssetPurchaseState
      */
+    @JsonIgnore
     public AssetPurchaseState getPurchaseState() {
         return mPurchaseState;
     }
@@ -170,6 +176,7 @@ public final class LicenseRequest {
     /**
      * @return true if format is set to message_ccx else return false;
      */
+    @JsonIgnore
     public boolean getFormat() {
         return mFormat.equals("message_ccx");
     }
@@ -198,6 +205,7 @@ public final class LicenseRequest {
      *         LicenseReference.
      * @see LicenseReference
      */
+    @JsonGetter("cce_agency")
     public LicenseReference[] getLicenseReference() {
         if (mLicenseReference == null) {
             return null;
