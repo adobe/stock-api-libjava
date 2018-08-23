@@ -35,7 +35,7 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 
@@ -83,6 +83,16 @@ final class HttpUtils {
     private static final int HTTP_STATUS_CODE_REDIRECT = 3;
 
     /**
+     * Constant for max connections.
+    */
+    private static final int MAX_TOTAL_CONNECTIONS = 200;
+
+    /**
+     * Constant for max connections per route.
+     */
+    private static final int MAX_PER_ROUTE_CONNECTIONS = 20;
+
+    /**
      * The http client instance for Http requests excutions.
      */
     private static HttpClient sHttpClient;
@@ -90,7 +100,7 @@ final class HttpUtils {
     /**
      * The time out constant for connection request as well as socket.
      */
-    private static final int TIME_OUT = 3 * 1000;
+    private static final int TIME_OUT = 6 * 1000;
 
     /**
      * The default constructor for HttpUtils.
@@ -106,10 +116,12 @@ final class HttpUtils {
     private static HttpClient initialize() {
         PoolingHttpClientConnectionManager connManager
                 = new PoolingHttpClientConnectionManager();
+        connManager.setMaxTotal(MAX_TOTAL_CONNECTIONS);
+        connManager.setDefaultMaxPerRoute(MAX_PER_ROUTE_CONNECTIONS);
         RequestConfig config = RequestConfig.custom()
                 .setConnectionRequestTimeout(TIME_OUT)
                 .setSocketTimeout(TIME_OUT).build();
-        HttpClient httpClient = HttpClientBuilder.create()
+        HttpClient httpClient = HttpClients.custom()
                 .setConnectionManager(connManager).disableRedirectHandling()
                 .setDefaultRequestConfig(config).build();
         return httpClient;
@@ -179,6 +191,11 @@ final class HttpUtils {
             throw se;
         } catch (Exception ex) {
             throw new StockException(ex.getMessage());
+        } finally {
+            if (response != null) {
+                EntityUtils.consumeQuietly(response.getEntity());
+            }
+            request.releaseConnection();
         }
 
         return responseBody;
@@ -253,6 +270,11 @@ final class HttpUtils {
             throw se;
         } catch (Exception ex) {
             throw new StockException(-1, ex.getMessage());
+        } finally {
+            if (response != null) {
+                EntityUtils.consumeQuietly(response.getEntity());
+            }
+            request.releaseConnection();
         }
 
         return responseBody;
