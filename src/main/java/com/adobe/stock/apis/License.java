@@ -40,12 +40,15 @@ final class LicenseAPIHelpers {
      * @param request the object of LicenseRequest which needs
      * to be validated
      * @param accessToken ims user access token
-     * @throws StockException if category id is not present in the request
+     * @param requiresLicenseState whether the license state is required
+     * @throws StockException if one of the required parameters is not present
+     * in the request
      * @see LicenseRequest
      * @see StockException
      */
     static void validateLicenseQueryParams(
-            final LicenseRequest request, final String accessToken)
+            final LicenseRequest request, final String accessToken,
+            final boolean requiresLicenseState)
                     throws StockException {
         if (request == null) {
             throw new StockException("Request can't be null");
@@ -55,7 +58,7 @@ final class LicenseAPIHelpers {
             throw new StockException(
                     "Asset Content id must be present in the license request");
         }
-        if (request.getLicenseState() == null) {
+        if (requiresLicenseState && request.getLicenseState() == null) {
             throw new StockException(
                     "Licensing state must be present in the license request");
         }
@@ -169,7 +172,8 @@ public final class License {
     public LicenseResponse getContentInfo(
             final LicenseRequest request, final String accessToken)
             throws StockException {
-        LicenseAPIHelpers.validateLicenseQueryParams(request, accessToken);
+        LicenseAPIHelpers.validateLicenseQueryParams(request, accessToken,
+                false);
 
         String requestURL = LicenseAPIHelpers.createLicenseApiUrl(
                 this.mConfig.getEndpoints().getLicenseContentInfoEndpoint(),
@@ -200,7 +204,8 @@ public final class License {
             throws StockException {
 
         String responseString = "";
-        LicenseAPIHelpers.validateLicenseQueryParams(request, accessToken);
+        LicenseAPIHelpers.validateLicenseQueryParams(request, accessToken,
+                true);
 
         String requestURL = LicenseAPIHelpers.createLicenseApiUrl(
                 this.mConfig.getEndpoints().getLicenseContentLicenseEndpoint(),
@@ -242,7 +247,8 @@ public final class License {
      */
     public LicenseResponse getMemberProfile(final LicenseRequest request,
             final String accessToken) throws StockException {
-        LicenseAPIHelpers.validateLicenseQueryParams(request, accessToken);
+        LicenseAPIHelpers.validateLicenseQueryParams(request, accessToken,
+                false);
         String requestURL = LicenseAPIHelpers.createLicenseApiUrl(
                 this.mConfig.getEndpoints().getLicenseMemberProfileEndpoint(),
                 request);
@@ -266,7 +272,8 @@ public final class License {
      */
     public void abandonLicense(final LicenseRequest request,
             final String accessToken) throws StockException {
-        LicenseAPIHelpers.validateLicenseQueryParams(request, accessToken);
+        LicenseAPIHelpers.validateLicenseQueryParams(request, accessToken,
+                true);
         String requestURL = LicenseAPIHelpers.createLicenseApiUrl(
                 this.mConfig.getEndpoints().getLicenseMemberAbandonEndpoint(),
                 request);
@@ -291,7 +298,8 @@ public final class License {
      */
     public String downloadAsset(final LicenseRequest request,
             final String accessToken) throws StockException {
-        LicenseAPIHelpers.validateLicenseQueryParams(request, accessToken);
+        LicenseAPIHelpers.validateLicenseQueryParams(request, accessToken,
+                true);
         LicenseResponse contentInfo = this.getContentInfo(request, accessToken);
         if (contentInfo == null) {
             throw new StockException(

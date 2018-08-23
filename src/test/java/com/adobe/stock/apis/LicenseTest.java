@@ -273,14 +273,6 @@ public class LicenseTest {
     }
 
     @Test(groups = "License.getMemberProfile", expectedExceptions = {
-            StockException.class }, expectedExceptionsMessageRegExp = "Licensing state must be present in the license request")
-    public void getMemberProfile_should_throw_stockexception_since_license_state_not_present_request()
-            throws StockException {
-        License api = new License(config);
-        api.getMemberProfile(new LicenseRequest().setContentId(84071201), "testToken");
-    }
-
-    @Test(groups = "License.getMemberProfile", expectedExceptions = {
             StockException.class }, expectedExceptionsMessageRegExp = "Access token can't be null or empty")
     public void getMemberProfile_should_throw_stockexception_since_access_token_not_present_request()
             throws StockException {
