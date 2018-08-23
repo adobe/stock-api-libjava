@@ -28,6 +28,7 @@ public void initializeTestData() {
     testData.put(AssetPurchaseState.NOT_POSSIBLE, "not_possible");
     testData.put(AssetPurchaseState.NOT_PURCHASED, "not_purchased");
     testData.put(AssetPurchaseState.OVERAGE, "overage");
+    testData.put(AssetPurchaseState.POSSIBLE, "possible");
     testData.put(AssetPurchaseState.PURCHASED, "purchased");
 }
 
