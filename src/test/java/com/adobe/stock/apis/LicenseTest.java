@@ -36,8 +36,6 @@ import com.adobe.stock.exception.StockException;
 import com.adobe.stock.models.LicenseReference;
 import com.adobe.stock.models.LicenseRequest;
 import com.adobe.stock.models.LicenseResponse;
-import com.adobe.stock.models.SearchCategoryRequest;
-import com.adobe.stock.models.StockFileCategory;
 
 @PowerMockIgnore({ "javax.management.*", "javax.xml.parsers.*",
     "com.sun.org.apache.xerces.internal.jaxp.*", "ch.qos.logback.*",
@@ -386,6 +384,12 @@ public class LicenseTest {
             .when(HttpUtils.doGet(Mockito.anyString(),
                     Matchers.<Map<String, String>> any()))
             .thenReturn(jsonResponse, jsonResponse,"url");
+
+            PowerMockito
+                .when(HttpUtils.resolveDownloadUrl(Mockito.anyString(),
+                    Matchers.<Map<String, String>> any()))
+                .thenReturn("url");
+
             License api = new License(config);
             String assetUrl = api.downloadAsset(new LicenseRequest().setContentId(84071201).setLicenseState(AssetLicenseState.STANDARD), "accessToken");
             Assert.assertEquals(assetUrl, "url");

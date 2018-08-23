@@ -30,6 +30,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
@@ -125,6 +126,49 @@ final class HttpUtils {
                 .setConnectionManager(connManager).disableRedirectHandling()
                 .setDefaultRequestConfig(config).build();
         return httpClient;
+    }
+
+    /**
+     * Executes a HTTP-Head request to check if a redirect url is
+     * given for the asset download url.
+     *
+     * @param uri     Endpoint that needs to be hit
+     * @param headers Key value pair of headers
+     * @return the real download url of an asset
+     * @throws StockException if api doesn't return with success code
+     * or when null/empty endpoint is passed in uri
+     */
+    static String resolveDownloadUrl(final String uri,
+          final Map<String, String> headers) throws StockException {
+        if (sHttpClient == null) {
+            sHttpClient = HttpUtils.initialize();
+        }
+
+        if (uri == null || uri.isEmpty()) {
+            throw new StockException(-1, "URI cannot be null or Empty");
+        }
+
+        HttpHead request = new HttpHead();
+
+        if (headers != null) {
+            for (Entry<String, String> entry : headers.entrySet()) {
+                request.setHeader(entry.getKey(), entry.getValue());
+            }
+        }
+
+        try {
+            request.setURI(new URI(uri));
+            HttpResponse response = sHttpClient.execute(request);
+            if (response.getStatusLine().getStatusCode()
+                / HTTP_STATUS_CODE_DIVISOR == HTTP_STATUS_CODE_REDIRECT) {
+                return response.getFirstHeader("Location").getValue();
+            }
+        } catch (Exception e) {
+            throw new StockException(e.getMessage());
+        } finally {
+            request.releaseConnection();
+        }
+        return uri;
     }
 
     /**
