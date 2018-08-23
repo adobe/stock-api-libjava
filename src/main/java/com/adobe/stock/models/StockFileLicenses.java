@@ -64,7 +64,7 @@ public final class StockFileLicenses {
      * @param standardM
      *            half-priced premium license type
      */
-    @JsonSetter("Standard-M")
+    @JsonSetter("Standard_M")
     public void setStandardM(final StockFileLicenseProp standardM) {
         this.mStandardM = standardM;
     }
