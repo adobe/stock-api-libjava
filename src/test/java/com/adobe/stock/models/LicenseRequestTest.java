@@ -104,6 +104,27 @@ public class LicenseRequestTest {
         Assert.assertEquals(true, licenseRequest.getFormat());
     }
 
+    @Test(groups = { "Exceptions" }, expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "License again can be set to true or false only.")
+    void setLicenseAgain_should_throw_exception_if_null_value_is_passed() {
+        licenseRequest.setLicenseAgain(null);
+    }
+    @Test(groups = { "Setters" })
+    void setLicenseAgain_should_set_null_in_license_again_field_if_false_is_passed_and_should_return_instanceof_LicenseRequest()
+            throws IllegalAccessException, NoSuchFieldException {
+        Assert.assertNotNull(licenseRequest.setLicenseAgain(false));
+        Field f = licenseRequest.getClass().getDeclaredField("mLicenseAgain");
+        f.setAccessible(true);
+        Assert.assertEquals(null, f.get(licenseRequest));
+    }
+    @Test(groups = { "Getters" })
+    void getLicenseAgain_should_return_whether_license_again_is_set_to_message_ccx_or_not()
+            throws NoSuchFieldException, IllegalAccessException {
+        Field f = licenseRequest.getClass().getDeclaredField("mLicenseAgain");
+        f.setAccessible(true);
+        f.set(licenseRequest, true);
+        Assert.assertEquals(Boolean.TRUE, licenseRequest.getLicenseAgain());
+    }
+
     @Test(groups = { "Exceptions" }, expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Format can be set to true or false only.")
     void setFormat_should_throw_exception_if_null_value_is_passed() {
         licenseRequest.setFormat(null);

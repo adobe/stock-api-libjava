@@ -62,6 +62,14 @@ public final class LicenseRequest {
     private String mFormat;
 
     /**
+     * Use only with Content/License. Optional.
+     * Used to re-license an asset, deducting licenses/credits as if it were
+     * a new transaction.
+     */
+    @SearchParamURLMapperInternal(value = "license_again")
+    private Boolean mLicenseAgain;
+
+    /**
      * Array of license references of type LicenseReference.
      * Must be in the POST body.
      * @see LicenseReference
@@ -196,6 +204,35 @@ public final class LicenseRequest {
             mFormat = "message_ccx";
         } else {
             mFormat = null;
+        }
+        return this;
+    }
+
+    /**
+     * Get whether the asset should be re-license, deducting licenses/credits
+     * as if it were a new transaction.
+     * @return true if the asset should be re-licensed
+     */
+    @JsonIgnore
+    public Boolean getLicenseAgain() {
+        return mLicenseAgain;
+    }
+
+    /**
+     * Sets whether the asset should be re-license, deducting licenses/credits
+     * as if it were a new transaction.
+     * @param licenseAgain licenseAgain true if the asset should be re-licensed
+     * @return Object of LicenseRequest
+     */
+    public LicenseRequest setLicenseAgain(final Boolean licenseAgain) {
+        if (licenseAgain == null) {
+            throw new IllegalArgumentException(
+                    "License again can be set to true or false only.");
+        }
+        if (licenseAgain) {
+            mLicenseAgain = true;
+        } else {
+            mLicenseAgain = null;
         }
         return this;
     }
