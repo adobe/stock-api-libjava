@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import org.apache.http.HttpStatus;
@@ -220,7 +221,8 @@ public final class License {
             String jsonString = JsonUtils.parseObjectToJson(
                     request);
             responseString = HttpUtils.doPost(requestURL, headers,
-                    jsonString.getBytes(), ContentType.APPLICATION_JSON);
+                    jsonString.getBytes(StandardCharsets.UTF_8),
+                    ContentType.APPLICATION_JSON);
             }
 
         LicenseResponse reponse = (LicenseResponse) JsonUtils
