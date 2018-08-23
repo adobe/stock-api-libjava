@@ -248,15 +248,15 @@ final class HttpUtils {
                 request.setEntity(entity);
             }
             response = sHttpClient.execute(request);
+            int statusCode = response.getStatusLine().getStatusCode();
 
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK
-                    || response.getStatusLine().getStatusCode()
-                        == HttpStatus.SC_CREATED) {
+            if (statusCode == HttpStatus.SC_OK
+                    || statusCode == HttpStatus.SC_CREATED
+                    || statusCode == HttpStatus.SC_NO_CONTENT) {
                 responseBody = EntityUtils.toString(response.getEntity());
             } else if (response.getStatusLine().getStatusCode()
                     / HTTP_STATUS_CODE_DIVISOR == HTTP_STATUS_CODE_API_ERROR) {
                 responseBody = EntityUtils.toString(response.getEntity());
-
                 throw new StockException(response.getStatusLine()
                         .getStatusCode(), responseBody);
             } else if (response.getStatusLine().getStatusCode()

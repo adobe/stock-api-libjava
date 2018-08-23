@@ -116,7 +116,7 @@ You can construct the object of this class with below arguments -
     * `request` - the request object of `SearchFilesRequest` consisting the locale, results column, search parameters etc.
 
 * Returns:
-    * The response object (`SearchFilesResponse`) containing the search files api results matching the request object.
+    * `SearchFiles` object that can be used to call its various methods for searching stock files.
 
 ##### Example
 Sample code to instantiate the SearchFiles Api -
@@ -157,7 +157,7 @@ public static void main(String[] args) {
 More examples can be found at the end of this document.
 
 ##### Methods
-* `SearchFiles` Methods can throw StockException if there are no search results available. It allows you to -
+* `SearchFiles` Methods returns response in the form of `SearchFilesResponse` object and can throw StockException if there are no search results available. It allows you to -
     * `getNextResponse` - Method to get next search files response page. It moves the state to next page and fetch the searchFiles response for the same. If the api returns with error or if there are no more search results available for the search request, the method will throw the StockException.
     * `getPreviousResponse` -  Method to get previous search files response page. It moves the state to previous page and fetch the searchFiles response for the same. If the api returns with error or if there are no more search results available for the search request or the state is pointing to invalid state, the method will throw the StockException.
     * `getResponsePage` - Method to skip to a specific search files response page. It moves the state to provided search page and fetch the searchFiles response for the same. It will throw StockException if there is any failure while searchFiles api or if the provided search page index is out of total search pages available.
@@ -398,9 +398,8 @@ You can construct the object of this class with below arguments -
 * Requires:
     * `config` - the stock configuration object of `StockConfig` type.
 
-* Returns:
-    * `StockFileCategory` - The response object containing the search category API results matching the request object returned by `getCategory` method.
-    * `ArrayList<StockFileCategory>` - The list of response object containing the search category tree API results matching the request object returned by `getCategoryTree` method.
+* Returns: 
+   * `SearchCategory` object that can be used to call its various methods for searching stock files category.
 
 ##### Example
 Sample code to instantiate the SearchCategory API -
@@ -436,9 +435,8 @@ public static void main(String[] args) {
 
 ##### Methods
 * `SearchCategory` Methods can throw StockException if request is not valid or API returns with an error. It allows you to -
-    * `getCategory` - Method to get information about a category of Stock assets, such as travel or animals for a specified category identifier, optionally localized. You need to pass `SearchCategoryRequest` object containing category identifier and locale(optional) parameters. If the request object is not valid or API returns with error, the method will throw the StockException.
-    * `getCategoryTree` - Method to get category information for zero or more category identifiers.  You need to pass `SearchCategoryRequest` object containing category identifier and locale parameters (both optional). If request object does not contain category identifier, this returns a list of all stock categories. If the request object is not valid or API returns with error, the method will throw the StockException.
-
+    * `getCategory` - Method to get information about a category of Stock assets in the form of `StockFileCategory` object, such as travel or animals for a specified category identifier, optionally localized. You need to pass `SearchCategoryRequest` object containing category identifier and locale(optional) parameters. If the request object is not valid or API returns with error, the method will throw the StockException.
+    * `getCategoryTree` - Method to get category information for zero or more category identifiers in the form of `ArrayList<StockFileCategory>` object.  You need to pass `SearchCategoryRequest` object containing category identifier and locale parameters (both optional). If request object does not contain category identifier, this returns a list of all stock categories. If the request object is not valid or API returns with error, the method will throw the StockException.
 
 #### SearchCategoryRequest
 In order to make SearchCategory/SearchCategoryTree API call, you need to create a `SearchCategoryRequest` object to define the search criterion for search category results. You can set category identifier and location language code supported by Stock Search Category/Category Tree API here.
@@ -479,7 +477,7 @@ You can construct the object of this class with below arguments -
     * `config` - the stock configuration object of `StockConfig` type.
 
 * Returns:
-    * `LicenseResponse` - The response object containing the asset content id, purchase details, license state results matching the request object returned by `getContentInfo` , `getContentLicense`, `getMemberProfile`,`abandonLicense` method.
+    * `License` object that can be used to call its various methods for licensing,abonding or to get the license info of the stock images
 
 #### License Request
  In order to call `License` APIs you need to create `LicenseRequest` object for licensing assets, for getting licensing information about a specific asset for specific user, for notifying the system when a user abandons a licensing operation, for getting the licensing capabilities for a specific user.
@@ -774,7 +772,7 @@ You can construct the object of this class with below arguments -
     * `request` - the request object of `LicenseHistoryRequest` consisting the locale, results column, search parameters etc.
 
 * Returns:
-    * The response object (`LicenseHistoryResponse`) containing the LicenseHistory files api results matching the request object.
+    * `LicenseHistory` object that can be used to call its various methods for accessing license history.
 
 ##### Example
 Sample code to instantiate the LicenseHistory Api -
@@ -814,7 +812,7 @@ Sample code to instantiate the LicenseHistory Api -
 More examples can be found at the end of this document.
 
 ##### Methods
-* `LicenseHistory` Methods can throw StockException if there are no results available. It allows you to -
+* `LicenseHistory` Methods returns response in the form of `LicenseHistoryResponse` object. Also, methods can throw StockException if there are no results available. It allows you to -
     * `getNextLicenseHistory` - Method to get next LicenseHistory files response page. It moves the state to next page and fetch the LicenseHistory response for the same. If the api returns with error or if there are no more search results available for the request, the method will throw the StockException.
 
     * `getPreviousLicenseHistory` -  Method to get previous LicenseHistory files response page. It moves the state to previous page and fetch the LicenseHistory response for the same. If the api returns with error or if there are no more search results available for the request or the state is pointing to invalid state, the method will throw the StockException.
@@ -994,4 +992,123 @@ public static void main(String[] args) {
     }
 }
 
+```
+### Entitlements
+`Entitlements` api class allows you to list all entitlements of a user within the organizations. Also, it allows the selection of the current active entitlement for an account.
+
+#### Instantiation
+You can construct the object of this class with below arguments -
+* Requires:
+     * `config` - the stock configuration object of `StockConfig` type.
+* Returns:
+     * `Entitlements` object that can be used to call its method `listEntitlements` and `selectEntitlement` for listing or selecting the entitlements respectively.
+
+##### Exmaple Code
+``` Java
+public static void main(String args[]) {
+        try {
+            //Valid access token for stock files.
+            String accessToken = "Ims Token";
+        
+            //Initialize config
+            StockConfig config = new StockConfig()
+                    .setApiKey("AdobeStockClient1")
+                    .setProduct("Adobe Stock Lib/1.0.0");
+            
+            //Initializing api
+            Entitlements api = new Entitlements(config);
+        } catch (Exception e) {
+            throw new StockException("error in entitlement api");
+        }
+}
+```
+#### Methods
+   * `listEntitlements` The method `listEntitlements` returns list of all entitlements for an account. It needs either user `access token` or `service token` and `entity refernce` for the providing response in the form of `EntitlementList` object containing the stock `user guid`, `creation date`, `list of organizations` and list of `entitlements` within the organizations.
+   * `selectEntitlement` It selects entitlement from the list of avaialble entitlements depending on the entitlementGuid, if entitlementGuid is not passsed, personal entitlement would be selected.
+
+#### Entitlement List Response
+After calling `listEntitlements` method in `Entitlements` api class, response is returned in the form of `EntitlementList`. It contains following fields. 
+|Parameter| Getter Methods | Related Class     |Description|
+|---|---|---|---|
+|guid |getGuid||Stock users AdobeId.|
+|creation_date|getCreationDate||Get account Creation Date|
+|organizations|getOrganizations|EntitlementOrganization|Get List of Entitlement Organizations. See EntitlementOrganization|
+|entitlements|getEntitlements|Entitlement|List of entitlements in each organization. See Entitlement|
+
+##### EntitlementOrganization
+Entitlement organization for an account.
+   * `id` Organization Id.
+   * `Name` Organization Name
+   * `Entitlements` List of Entitlements within the organization
+
+##### Entitlement
+Entitlement for an account within the organization.
+
+   * `entitlement_id` Entitlement Id.
+   * `Label` Entitlement Label.
+   * `guid` Stock user id.
+   * `creation` Entitlement Creation Date.
+   * `nb_active_allotments` Number of active allotments.
+   * `licenses_available` Number of Licenses Available.
+   * `licenses_used` Number of Licenses used.
+   * `has_overage`Boolean flag for Overage.
+   * `is_default_entitlement` Check for default entitlement of feature flag is on.
+   * `suspend_date` Entitlement Suspend Date.
+   
+
+#### Examples 
+##### List Entitlement
+
+``` Java
+public static void main(String args[]) {
+        try {
+            //Valid access token for stock files.
+            String accessToken = "Ims Token";
+        
+            //Initialize config
+            StockConfig config = new StockConfig()
+                    .setApiKey("AdobeStockClient1")
+                    .setProduct("Adobe Stock Lib/1.0.0");
+            
+            //Initializing api
+            Entitlements api = new Entitlements(config);
+            
+            //calling list entitlements method
+            EntitlementList response = api.listEntitlements(accessToken, null);
+            
+            System.out.println("Entitlement List Response:");
+            print("Entitlement Organization Id:",response.getOrganizations().get(0).getId());
+            print("Entitlement Id", response.getOrganizations().get(0).getEntitlements().get(0).getEntitlementId());
+        } catch (Exception e) {
+            throw new StockException("error in entitlement api");
+        }
+}
+```
+
+##### Select Entitlement
+```  Java
+public static void main(String args[]) {
+        try {
+            //Valid access token for stock files.
+            String accessToken = "Ims Token";
+        
+            //Initialize config
+            StockConfig config = new StockConfig()
+                    .setApiKey("AdobeStockClient1")
+                    .setProduct("Adobe Stock Lib/1.0.0");
+            
+            //Initializing api
+            Entitlements api = new Entitlements(config);
+            
+            //calling list entitlements method
+            EntitlementList response = api.listEntitlements(accessToken, null);
+            String guid = response.getOrganizations().get(0).getEntitlements().get(0).getEntitlementId();
+            //select one entitlement (switch account) from the lisst
+            api.selectEntitlement(accessToken, guid, "");
+            
+            System.out.println("Entitlement has been selected");
+        } catch (Exception e) {
+            throw new StockException("error in entitlement select api");
+        
+}
 ```

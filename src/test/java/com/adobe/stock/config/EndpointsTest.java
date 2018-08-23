@@ -33,6 +33,8 @@ public class EndpointsTest {
     private static final String SEARCH_FILES_ENDPOINT_KEY = "api.endpoints.search";
     private static final String PROPS_FILE_PROD = "prod-environment.properties";
     private static final String PROPS_FILE_STAGE = "stage-environment.properties";
+    private static final String LIST_ENTITLEMENT_ENDPOINT_KEY = "api.endpoints.entitlementlist";
+    private static final String SELECT_ENTITLEMENT_ENDPOINT_KEY = "api.endpoints.selectentitlement";
 
     @ObjectFactory
     public IObjectFactory getObjectFactory() {
@@ -131,6 +133,40 @@ public class EndpointsTest {
             props.load(input);
             Assert.assertEquals(props.getProperty(SEARCH_FILES_ENDPOINT_KEY),
                     endpoints.getSearchFilesEndpoint());
+            input.close();
+        } catch (Exception e) {
+            Assert.fail("Didn't expect the Exception!", e);
+        }
+    }
+    @Test(groups = "Endpoints.getListEntitlementsEndPoint")
+    public void getEntitlementListEndPoint_should_return_stage_endpoint_if_environment_is_stage() {
+        try {
+            Endpoints endpoints = new Endpoints(Environment.STAGE);
+            InputStream input = getClass().getClassLoader()
+                    .getResourceAsStream(PROPS_FILE_STAGE);
+            if (input == null)
+                Assert.fail("Could not load properties file");
+            Properties props = new Properties();
+            props.load(input);
+            Assert.assertEquals(props.getProperty(LIST_ENTITLEMENT_ENDPOINT_KEY),
+                    endpoints.getEntitlementListEndPoint());
+            input.close();
+        } catch (Exception e) {
+            Assert.fail("Didn't expect the Exception!", e);
+        }
+    }
+    @Test(groups = "Endpoints.getSearchFilesEndpoint")
+    public void getSelectEntitlementEndpoint_should_return_stage_endpoint_if_environment_is_stage() {
+        try {
+            Endpoints endpoints = new Endpoints(Environment.STAGE);
+            InputStream input = getClass().getClassLoader()
+                    .getResourceAsStream(PROPS_FILE_STAGE);
+            if (input == null)
+                Assert.fail("Could not load properties file");
+            Properties props = new Properties();
+            props.load(input);
+            Assert.assertEquals(props.getProperty(SELECT_ENTITLEMENT_ENDPOINT_KEY),
+                    endpoints.getSelectEntitlementEndpoint());
             input.close();
         } catch (Exception e) {
             Assert.fail("Didn't expect the Exception!", e);
