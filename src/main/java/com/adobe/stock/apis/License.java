@@ -333,7 +333,7 @@ public final class License {
                         .equals(AssetPurchaseState.OVERAGE));
             if (canBuy) {
                 throw new StockException("Content not licensed but have "
-                        + "enough quota or overage plan, so first buy the license");
+                    + "enough quota or overage plan, so first buy the license");
             } else {
                 throw new StockException("Content not licensed "
                         + "and you do not have enough quota or overage plan");
