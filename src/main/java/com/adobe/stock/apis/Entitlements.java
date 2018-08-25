@@ -10,7 +10,6 @@ package com.adobe.stock.apis;
 import java.net.URISyntaxException;
 import java.util.Map;
 
-import org.apache.http.HttpStatus;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 
@@ -135,7 +134,7 @@ public final class Entitlements {
     public void selectEntitlement(final String accessToken,
             final String entitlementGuid, final String entityReference)
                     throws StockException {
-        String jsonString = "";
+        String params = "";
         String requestURL = EntitlementsApiHelper.createApiURL(
                 this.mConfig.getEndpoints().getSelectEntitlementEndpoint(),
                 accessToken, entityReference);
@@ -143,13 +142,9 @@ public final class Entitlements {
                 .generateCommonAPIHeaders(this.mConfig, accessToken);
 
         if (entitlementGuid != null && !entitlementGuid.isEmpty()) {
-            jsonString = "{\"" + ENTITLEMENT_GUID_PARAM + "\":\""
-                    + entitlementGuid + "\"}";
+            params = ENTITLEMENT_GUID_PARAM + "=" + entitlementGuid;
         }
-        String responseString = HttpUtils.doPost(requestURL, headers,
-                jsonString.getBytes(), ContentType.APPLICATION_FORM_URLENCODED);
-        if (!responseString.equals(String.valueOf(HttpStatus.SC_NO_CONTENT))) {
-            throw new StockException("Stock API returned with an error");
-        }
+        HttpUtils.doPost(requestURL, headers,
+                params.getBytes(), ContentType.APPLICATION_FORM_URLENCODED);
     }
 }

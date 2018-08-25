@@ -30,12 +30,13 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 
@@ -83,6 +84,16 @@ final class HttpUtils {
     private static final int HTTP_STATUS_CODE_REDIRECT = 3;
 
     /**
+     * Constant for max connections.
+    */
+    private static final int MAX_TOTAL_CONNECTIONS = 200;
+
+    /**
+     * Constant for max connections per route.
+     */
+    private static final int MAX_PER_ROUTE_CONNECTIONS = 20;
+
+    /**
      * The http client instance for Http requests excutions.
      */
     private static HttpClient sHttpClient;
@@ -90,7 +101,7 @@ final class HttpUtils {
     /**
      * The time out constant for connection request as well as socket.
      */
-    private static final int TIME_OUT = 3 * 1000;
+    private static final int TIME_OUT = 6 * 1000;
 
     /**
      * The default constructor for HttpUtils.
@@ -106,13 +117,58 @@ final class HttpUtils {
     private static HttpClient initialize() {
         PoolingHttpClientConnectionManager connManager
                 = new PoolingHttpClientConnectionManager();
+        connManager.setMaxTotal(MAX_TOTAL_CONNECTIONS);
+        connManager.setDefaultMaxPerRoute(MAX_PER_ROUTE_CONNECTIONS);
         RequestConfig config = RequestConfig.custom()
                 .setConnectionRequestTimeout(TIME_OUT)
                 .setSocketTimeout(TIME_OUT).build();
-        HttpClient httpClient = HttpClientBuilder.create()
+        HttpClient httpClient = HttpClients.custom()
                 .setConnectionManager(connManager).disableRedirectHandling()
                 .setDefaultRequestConfig(config).build();
         return httpClient;
+    }
+
+    /**
+     * Executes a HTTP-Head request to check if a redirect url is
+     * given for the asset download url.
+     *
+     * @param uri     Endpoint that needs to be hit
+     * @param headers Key value pair of headers
+     * @return the real download url of an asset
+     * @throws StockException if api doesn't return with success code
+     * or when null/empty endpoint is passed in uri
+     */
+    static String resolveDownloadUrl(final String uri,
+          final Map<String, String> headers) throws StockException {
+        if (sHttpClient == null) {
+            sHttpClient = HttpUtils.initialize();
+        }
+
+        if (uri == null || uri.isEmpty()) {
+            throw new StockException(-1, "URI cannot be null or Empty");
+        }
+
+        HttpHead request = new HttpHead();
+
+        if (headers != null) {
+            for (Entry<String, String> entry : headers.entrySet()) {
+                request.setHeader(entry.getKey(), entry.getValue());
+            }
+        }
+
+        try {
+            request.setURI(new URI(uri));
+            HttpResponse response = sHttpClient.execute(request);
+            if (response.getStatusLine().getStatusCode()
+                / HTTP_STATUS_CODE_DIVISOR == HTTP_STATUS_CODE_REDIRECT) {
+                return response.getFirstHeader("Location").getValue();
+            }
+        } catch (Exception e) {
+            throw new StockException(e.getMessage());
+        } finally {
+            request.releaseConnection();
+        }
+        return uri;
     }
 
     /**
@@ -179,6 +235,11 @@ final class HttpUtils {
             throw se;
         } catch (Exception ex) {
             throw new StockException(ex.getMessage());
+        } finally {
+            if (response != null) {
+                EntityUtils.consumeQuietly(response.getEntity());
+            }
+            request.releaseConnection();
         }
 
         return responseBody;
@@ -231,15 +292,15 @@ final class HttpUtils {
                 request.setEntity(entity);
             }
             response = sHttpClient.execute(request);
+            int statusCode = response.getStatusLine().getStatusCode();
 
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK
-                    || response.getStatusLine().getStatusCode()
-                        == HttpStatus.SC_CREATED) {
+            if (statusCode == HttpStatus.SC_OK
+                    || statusCode == HttpStatus.SC_CREATED
+                    || statusCode == HttpStatus.SC_NO_CONTENT) {
                 responseBody = EntityUtils.toString(response.getEntity());
             } else if (response.getStatusLine().getStatusCode()
                     / HTTP_STATUS_CODE_DIVISOR == HTTP_STATUS_CODE_API_ERROR) {
                 responseBody = EntityUtils.toString(response.getEntity());
-
                 throw new StockException(response.getStatusLine()
                         .getStatusCode(), responseBody);
             } else if (response.getStatusLine().getStatusCode()
@@ -253,6 +314,11 @@ final class HttpUtils {
             throw se;
         } catch (Exception ex) {
             throw new StockException(-1, ex.getMessage());
+        } finally {
+            if (response != null) {
+                EntityUtils.consumeQuietly(response.getEntity());
+            }
+            request.releaseConnection();
         }
 
         return responseBody;

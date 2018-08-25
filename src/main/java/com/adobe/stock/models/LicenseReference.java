@@ -8,6 +8,7 @@
 package com.adobe.stock.models;
 
 import com.adobe.stock.annotations.SearchParamURLMapperInternal;
+import com.fasterxml.jackson.annotation.JsonGetter;
 
 /**
  * @author pragatijohri
@@ -38,6 +39,7 @@ public final class LicenseReference {
     /**
      * @return license reference id.
      */
+    @JsonGetter("id")
     public Integer getLicenseReferenceId() {
         return mId;
     }
@@ -58,6 +60,7 @@ public final class LicenseReference {
     /**
      * @return Value of corresponding license id.
      */
+    @JsonGetter("value")
     public String getLicenseReferenceValue() {
         return mValue;
     }

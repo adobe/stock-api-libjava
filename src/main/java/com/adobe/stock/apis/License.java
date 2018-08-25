@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import org.apache.http.HttpStatus;
@@ -40,12 +41,15 @@ final class LicenseAPIHelpers {
      * @param request the object of LicenseRequest which needs
      * to be validated
      * @param accessToken ims user access token
-     * @throws StockException if category id is not present in the request
+     * @param requiresLicenseState whether the license state is required
+     * @throws StockException if one of the required parameters is not present
+     * in the request
      * @see LicenseRequest
      * @see StockException
      */
     static void validateLicenseQueryParams(
-            final LicenseRequest request, final String accessToken)
+            final LicenseRequest request, final String accessToken,
+            final boolean requiresLicenseState)
                     throws StockException {
         if (request == null) {
             throw new StockException("Request can't be null");
@@ -55,7 +59,7 @@ final class LicenseAPIHelpers {
             throw new StockException(
                     "Asset Content id must be present in the license request");
         }
-        if (request.getLicenseState() == null) {
+        if (requiresLicenseState && request.getLicenseState() == null) {
             throw new StockException(
                     "Licensing state must be present in the license request");
         }
@@ -169,7 +173,8 @@ public final class License {
     public LicenseResponse getContentInfo(
             final LicenseRequest request, final String accessToken)
             throws StockException {
-        LicenseAPIHelpers.validateLicenseQueryParams(request, accessToken);
+        LicenseAPIHelpers.validateLicenseQueryParams(request, accessToken,
+                false);
 
         String requestURL = LicenseAPIHelpers.createLicenseApiUrl(
                 this.mConfig.getEndpoints().getLicenseContentInfoEndpoint(),
@@ -200,7 +205,8 @@ public final class License {
             throws StockException {
 
         String responseString = "";
-        LicenseAPIHelpers.validateLicenseQueryParams(request, accessToken);
+        LicenseAPIHelpers.validateLicenseQueryParams(request, accessToken,
+                true);
 
         String requestURL = LicenseAPIHelpers.createLicenseApiUrl(
                 this.mConfig.getEndpoints().getLicenseContentLicenseEndpoint(),
@@ -213,9 +219,10 @@ public final class License {
              responseString = HttpUtils.doGet(requestURL, headers);
         } else {
             String jsonString = JsonUtils.parseObjectToJson(
-                    request.getLicenseReference());
-             responseString = HttpUtils.doPost(requestURL, headers,
-                    jsonString.getBytes(), ContentType.APPLICATION_JSON);
+                    request);
+            responseString = HttpUtils.doPost(requestURL, headers,
+                    jsonString.getBytes(StandardCharsets.UTF_8),
+                    ContentType.APPLICATION_JSON);
             }
 
         LicenseResponse reponse = (LicenseResponse) JsonUtils
@@ -242,7 +249,8 @@ public final class License {
      */
     public LicenseResponse getMemberProfile(final LicenseRequest request,
             final String accessToken) throws StockException {
-        LicenseAPIHelpers.validateLicenseQueryParams(request, accessToken);
+        LicenseAPIHelpers.validateLicenseQueryParams(request, accessToken,
+                false);
         String requestURL = LicenseAPIHelpers.createLicenseApiUrl(
                 this.mConfig.getEndpoints().getLicenseMemberProfileEndpoint(),
                 request);
@@ -266,7 +274,8 @@ public final class License {
      */
     public void abandonLicense(final LicenseRequest request,
             final String accessToken) throws StockException {
-        LicenseAPIHelpers.validateLicenseQueryParams(request, accessToken);
+        LicenseAPIHelpers.validateLicenseQueryParams(request, accessToken,
+                true);
         String requestURL = LicenseAPIHelpers.createLicenseApiUrl(
                 this.mConfig.getEndpoints().getLicenseMemberAbandonEndpoint(),
                 request);
@@ -277,25 +286,28 @@ public final class License {
             throw new StockException("Stock API returned with an error");
         }
     }
+
     /**
-     * Provide the URL of the asset if it is already licensed otherwise throws
-     * Exception showing a message whether user has enough quota and can buy
-     * the license or not.
-     * @param request request {@link LicenseRequest} object containing
-     *  content_id and license state.
+     * Builds the API URI of an asset including the token parameter to be able
+     * to call the API with this URL. It is possible that the API return a 302
+     * by calling this url, because some asset types are hosted on an s3 CDN.
+     *
+     * @param request {@link LicenseRequest} object containing
+     * content_id and license stat
      * @param accessToken ims user access token
-     * @return URL of the asset
+     * @return URI of the asset including the token parameter
      * @throws StockException if request is not valid or asset is not licensed
-     *  or licensing information is not present for the asset or API returns
+     * or licensing information is not present for the asset or API returns
      *  with an error
      */
-    public String downloadAsset(final LicenseRequest request,
+    public URI getDownloadUri(final LicenseRequest request,
             final String accessToken) throws StockException {
-        LicenseAPIHelpers.validateLicenseQueryParams(request, accessToken);
+        LicenseAPIHelpers.validateLicenseQueryParams(request, accessToken,
+                true);
         LicenseResponse contentInfo = this.getContentInfo(request, accessToken);
         if (contentInfo == null) {
             throw new StockException(
-                    "Could not find the licensing information for the asset");
+                "Could not find the licensing information for the asset");
         }
         LicensePurchaseDetails purchaseDetails = contentInfo.getContent(
                 request.getContentId().toString()).getPurchaseDetails();
@@ -317,8 +329,8 @@ public final class License {
                         + "user purchasing options for the asset");
             }
             boolean canBuy = (memberProfile.getEntitlement().getQuota() != 0)
-                    || (memberProfile.getPurchaseOptions().getPurchaseState()
-                            .equals(AssetPurchaseState.OVERAGE));
+                || (memberProfile.getPurchaseOptions().getPurchaseState()
+                        .equals(AssetPurchaseState.OVERAGE));
             if (canBuy) {
                 throw new StockException("Content not licensed but have "
                     + "enough quota or overage plan, so first buy the license");
@@ -333,18 +345,42 @@ public final class License {
                 getContentId().toString()).getPurchaseDetails();
         if ((purchaseDetails == null)
                 || (purchaseDetails.getUrl() == null)) {
-            throw new StockException(
+                throw new StockException(
                     "Could not find the purchase details for the asset");
         }
         try {
             URIBuilder uriBuilder = new URIBuilder(purchaseDetails.getUrl());
-            String url = uriBuilder.build().toURL().toString();
+            uriBuilder.addParameter("token", accessToken);
+            return uriBuilder.build();
+        } catch (IllegalArgumentException | URISyntaxException e) {
+            throw new StockException(
+                "Asset URL returned from Stock API is not valid");
+        }
+    }
+
+    /**
+     * Provide the URL of the asset if it is already licensed otherwise throws
+     * Exception showing a message whether user has enough quota and can buy
+     * the license or not.
+     *
+     * @param request request {@link LicenseRequest} object containing
+     *  content_id and license state.
+     * @param accessToken ims user access token
+     * @return URL of the asset
+     * @throws StockException if request is not valid or asset is not licensed
+     *  or licensing information is not present for the asset or API returns
+     *  with an error
+     */
+    public String downloadAsset(final LicenseRequest request,
+            final String accessToken) throws StockException {
+        URI assetUrl = getDownloadUri(request, accessToken);
+        try {
             Map<String, String> headers = ApiUtils
                     .generateCommonAPIHeaders(this.mConfig, accessToken);
-            String s3url = HttpUtils.doGet(url, headers);
+            String url = assetUrl.toURL().toString();
+            String s3url = HttpUtils.resolveDownloadUrl(url, headers);
             return s3url;
-        } catch (IllegalArgumentException | MalformedURLException
-                | URISyntaxException e) {
+        } catch (IllegalArgumentException | MalformedURLException  e) {
             throw new StockException(
                     "Asset URL returned from Stock API is not valid");
         }

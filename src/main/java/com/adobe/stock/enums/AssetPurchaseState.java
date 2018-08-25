@@ -31,6 +31,11 @@ public enum AssetPurchaseState {
     CANCELLED("cancelled"),
 
     /**
+     * User can license the asset.
+     */
+    POSSIBLE("possible"),
+
+    /**
      * User must go to the Adobe Stock site to buy plan or asset.
      */
     NOT_POSSIBLE("not_possible"),
@@ -76,6 +81,8 @@ public enum AssetPurchaseState {
             return AssetPurchaseState.PURCHASED;
         case "cancelled":
             return AssetPurchaseState.CANCELLED;
+        case "possible":
+            return AssetPurchaseState.POSSIBLE;
         case "not_possible":
             return AssetPurchaseState.NOT_POSSIBLE;
         case "just_purchased":

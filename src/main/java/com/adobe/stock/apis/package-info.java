@@ -8,4 +8,5 @@
 /**
  * Defines the Stock API classes.
  */
+@org.osgi.annotation.versioning.Version("1.0.0")
 package com.adobe.stock.apis;

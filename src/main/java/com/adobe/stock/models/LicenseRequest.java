@@ -10,6 +10,8 @@ package com.adobe.stock.models;
 import com.adobe.stock.annotations.SearchParamURLMapperInternal;
 import com.adobe.stock.enums.AssetLicenseState;
 import com.adobe.stock.enums.AssetPurchaseState;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Request object : for licensing assets, for getting licensing information
@@ -60,6 +62,14 @@ public final class LicenseRequest {
     private String mFormat;
 
     /**
+     * Use only with Content/License. Optional.
+     * Used to re-license an asset, deducting licenses/credits as if it were
+     * a new transaction.
+     */
+    @SearchParamURLMapperInternal(value = "license_again")
+    private Boolean mLicenseAgain;
+
+    /**
      * Array of license references of type LicenseReference.
      * Must be in the POST body.
      * @see LicenseReference
@@ -69,6 +79,7 @@ public final class LicenseRequest {
     /**
      * @return Asset's unique identifer.
      */
+    @JsonIgnore
     public Integer getContentId() {
         return mContentId;
     }
@@ -97,6 +108,7 @@ public final class LicenseRequest {
      *         passed, field will be ignored while calling this api.</b>
      * @see AssetLicenseState
      */
+    @JsonIgnore
     public AssetLicenseState getLicenseState() {
         return mLicenseState;
     }
@@ -122,6 +134,7 @@ public final class LicenseRequest {
     /**
      * @return Location language code for the API.
      */
+    @JsonIgnore
     public String getLocale() {
         return mLocale;
     }
@@ -146,6 +159,7 @@ public final class LicenseRequest {
      *         AssetPurchaseState.
      * @see AssetPurchaseState
      */
+    @JsonIgnore
     public AssetPurchaseState getPurchaseState() {
         return mPurchaseState;
     }
@@ -170,6 +184,7 @@ public final class LicenseRequest {
     /**
      * @return true if format is set to message_ccx else return false;
      */
+    @JsonIgnore
     public boolean getFormat() {
         return mFormat.equals("message_ccx");
     }
@@ -194,10 +209,40 @@ public final class LicenseRequest {
     }
 
     /**
+     * Get whether the asset should be re-license, deducting licenses/credits
+     * as if it were a new transaction.
+     * @return true if the asset should be re-licensed
+     */
+    @JsonIgnore
+    public Boolean getLicenseAgain() {
+        return mLicenseAgain;
+    }
+
+    /**
+     * Sets whether the asset should be re-license, deducting licenses/credits
+     * as if it were a new transaction.
+     * @param licenseAgain licenseAgain true if the asset should be re-licensed
+     * @return Object of LicenseRequest
+     */
+    public LicenseRequest setLicenseAgain(final Boolean licenseAgain) {
+        if (licenseAgain == null) {
+            throw new IllegalArgumentException(
+                    "License again can be set to true or false only.");
+        }
+        if (licenseAgain) {
+            mLicenseAgain = true;
+        } else {
+            mLicenseAgain = null;
+        }
+        return this;
+    }
+
+    /**
      * @return Array of licensing references having id and values pair of type
      *         LicenseReference.
      * @see LicenseReference
      */
+    @JsonGetter("cce_agency")
     public LicenseReference[] getLicenseReference() {
         if (mLicenseReference == null) {
             return null;

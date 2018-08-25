@@ -8,4 +8,5 @@
 /**
  * Defines the exceptions for Stock API Java SDK.
  */
+@org.osgi.annotation.versioning.Version("1.0.0")
 package com.adobe.stock.exception;

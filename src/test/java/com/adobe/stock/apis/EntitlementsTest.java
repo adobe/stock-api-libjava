@@ -71,14 +71,14 @@ public class EntitlementsTest {
             throws StockException {
         StockConfig config = new StockConfig();
         try {
-            new License(config);
+            new Entitlements(config);
         } catch (StockException e) {
             Assert.assertEquals(e.getMessage(),
                     "Api Key configuration can't be null!");
         }
         config.setApiKey("testKey");
         try {
-            new License(config);
+            new Entitlements(config);
         } catch (StockException e) {
             Assert.assertEquals(e.getMessage(),
                     "Product configuration can't be null!");
@@ -86,7 +86,7 @@ public class EntitlementsTest {
     }
 
     @Test(groups = "Entitlements.constructor")
-    public void Entitlements_should_return_new_object_of_License_class() {
+    public void Entitlements_should_return_new_object_of_Entitlements_class() {
         try {
             Entitlements api = new Entitlements(config);
             Assert.assertNotNull(api);
@@ -145,6 +145,7 @@ public class EntitlementsTest {
                     Matchers.any())).thenReturn(String.valueOf(HttpStatus.SC_NO_CONTENT));
             Entitlements api = new Entitlements(config);
             api.selectEntitlement("accessToken", "guid", "");
+            Assert.assertTrue(true);
         } catch (Exception e) {
             Assert.fail("Didn't expect the exception here!", e);
         }
@@ -158,24 +159,52 @@ public class EntitlementsTest {
                     Matchers.any(byte[].class), (ContentType)
                     Matchers.any())).thenReturn(String.valueOf(HttpStatus.SC_NO_CONTENT));
             Entitlements api = new Entitlements(config);
-            api.selectEntitlement("accessToken", null, "");
+            api.selectEntitlement("accessToken", null, null);
+            Assert.assertTrue(true);
+        } catch (Exception e) {
+            Assert.fail("Didn't expect the exception here!", e);
+        }
+    }
+    @Test(groups = "Entitlements.selectEntitlements")
+    public void selectEntitlements_should_return_valid_response_if_guid_is_empty() {
+        try {
+            PowerMockito
+            .when(HttpUtils.doPost(Mockito.anyString(),
+                    Matchers.<Map<String, String>> any(),
+                    Matchers.any(byte[].class), (ContentType)
+                    Matchers.any())).thenReturn(String.valueOf(HttpStatus.SC_NO_CONTENT));
+            Entitlements api = new Entitlements(config);
+            api.selectEntitlement("accessToken", "", "");
+            Assert.assertTrue(true);
         } catch (Exception e) {
             Assert.fail("Didn't expect the exception here!", e);
         }
     }
     @Test(groups = "Entitlements.selectEntitlements",
             expectedExceptions = { StockException.class })
-    public void selectEntitlements_should_throw_exception_if_response_is_not_as_expected() throws StockException {
-            try {
+    public void selectEntitlements_should_throw_exception_if_guid_is_invalid() throws StockException {
                 PowerMockito
                 .when(HttpUtils.doPost(Mockito.anyString(),
                         Matchers.<Map<String, String>> any(),
                         Matchers.any(byte[].class), (ContentType)
-                        Matchers.any())).thenReturn("Example Response");
-            } catch (StockException e) {
-                e.printStackTrace();
-            }
-            Entitlements api = new Entitlements(config);
-            api.selectEntitlement("accessToken", null, "");
+                        Matchers.any())).thenThrow(new StockException("Guid Not Found"));
+
+                Entitlements api = new Entitlements(config);
+                api.selectEntitlement("accessToken", "Invalid GUID", "");
+    }
+    @Test(groups = "Entitlements",
+            expectedExceptions = { StockException.class })
+    public void EntitlementsApiHelper_should_throw_exception_if_url_contains_special_character() throws Exception {
+        String uri = EntitlementsApiHelper.createApiURL("|", "accessToken", "");
+    }
+    @Test
+    public void EntitlementsAPIHelpers_instance_should_be_created_using_reflection()
+            throws NoSuchMethodException, IllegalAccessException,
+            InvocationTargetException, InstantiationException {
+        Constructor<EntitlementsApiHelper> constructor = EntitlementsApiHelper.class
+                .getDeclaredConstructor();
+        constructor.setAccessible(true);
+        EntitlementsApiHelper instance = constructor.newInstance();
+        Assert.assertNotNull(instance);
     }
 }
