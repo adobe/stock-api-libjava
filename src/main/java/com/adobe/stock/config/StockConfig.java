@@ -43,7 +43,7 @@ public final class StockConfig {
      * @see StockException
      */
     public StockConfig() throws StockException {
-        this.mTargetEnvironment = Environment.STAGE;
+        this.mTargetEnvironment = Environment.PROD;
         try {
             this.mEndpoints = new Endpoints(this.mTargetEnvironment);
         } catch (StockException e) {

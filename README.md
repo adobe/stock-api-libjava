@@ -5,15 +5,23 @@ This is a Java implementation of the various APIs provided by the Adobe Stock se
 
 
 ## Getting Started
-This is a maven project. Following steps are needed for getting started with this project:
-### Clean
+
+### Note to Windows users
+Because of the Checkstyle plugin that runs as part of the build process, you will not be able to successfully build/package the SDK on Windows unless you instruct Git to automatically change your line endings. Per [instructions here](https://help.github.com/articles/dealing-with-line-endings/), run this command prior to pulling the repository from GitHub.
+
+```shell
+git config --global core.autocrlf true
 ```
+
+This is a maven project. The following steps are needed for getting started with this project:
+### Clean
+```shell
 mvn clean
 ```
 
 ### Build
 To build the project, you can run the below command on console -
-```
+```shell
 mvn package
 ```
 The packages jar can be found at `target/` folder with the name `stockapissdk-<version>.jar`. This will also download the depenedent jars into `target/libs/` folder.
@@ -24,7 +32,7 @@ The above command will by default run the linting, test cases and the code cover
 Note - Since the test and coverage steps come later in the build process than linting, so if linting fails, you won't get the test cases and coverage reports.
 
 While running the above command if clean project is not run, it may throw some random errors. So it is advisable to run below command which does cleaning as well as building in the same step -
-```
+```shell
 mvn clean package
 ```
 
