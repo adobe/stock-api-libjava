@@ -5,7 +5,7 @@
     <groupId>com.adobe.stock</groupId>
     <artifactId>stockapissdk</artifactId>
     <packaging>bundle</packaging>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
     <name>Adobe Stock Apis SDK</name>
     <description>A Java sdk for Adobe Stock APIs</description>
     <licenses>
