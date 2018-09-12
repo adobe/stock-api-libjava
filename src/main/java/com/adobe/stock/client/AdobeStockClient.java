@@ -43,24 +43,27 @@ public class AdobeStockClient {
                     .setApiKey("AdobeStockClient1")
                     .setProduct("Adobe Stock Lib/1.0.0")
                     .setTargetEnvironment(Environment.STAGE)
-                    .setProductLocation("Libraries/1.0.0 ");
-            ResultColumn[] columns = { ResultColumn.STOCK_ID,
+                    .setProductLocation("libraries/2.10");
+            ResultColumn[] columns = { ResultColumn.ID,
                     ResultColumn.MEDIA_TYPE_ID, ResultColumn.NB_RESULTS,
-                    ResultColumn.WIDTH, ResultColumn.COUNTRY_NAME };
-            SearchParameters params = new SearchParameters().setWords("tree")
-                    .setLimit(10).setOffset(10);
+                    ResultColumn.WIDTH, ResultColumn.COUNTRY_NAME, ResultColumn.IS_EDITORIAL };
+            SearchParameters params = new SearchParameters().setWords("dogs")
+                    .setFilterEditorial(true).setLimit(10).setOffset(10);
             SearchFilesRequest request = new SearchFilesRequest()
                     .setSearchParams(params).setResultColumns(columns);
             SearchFiles searchFile = new SearchFiles(config, null, request);
             SearchFilesResponse response = searchFile.getNextResponse();
             System.out.println("Search Files Response:");
             print("total results", response.getNbResults());
-            print("stock id", response.getFiles().get(0).getStockId());
+            print("id", response.getFiles().get(0).getId());
             print("asset id", response.getFiles().get(0).getAssetTypeId());
             print("width", response.getFiles().get(0).getWidth());
             print("country", response.getFiles().get(0).getCountryName());
+            print("editorial", response.getFiles().get(0).getIsEditorial());
             System.out.println("");
         } catch (Exception e) {
+                    System.out.println(e);
+
             throw new StockException("error in search files");
         }
     }
@@ -235,7 +238,7 @@ public class AdobeStockClient {
         System.out.println(key + " : " + val.toString());
     }
     public static void main(String[] args) throws StockException {
-        testSelectEntitlement();
+        testSearchFiles();
     }
 
 }
