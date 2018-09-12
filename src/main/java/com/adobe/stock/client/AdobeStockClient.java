@@ -62,7 +62,6 @@ public class AdobeStockClient {
             print("editorial", response.getFiles().get(0).getIsEditorial());
             System.out.println("");
         } catch (Exception e) {
-                    System.out.println(e);
 
             throw new StockException("error in search files");
         }
