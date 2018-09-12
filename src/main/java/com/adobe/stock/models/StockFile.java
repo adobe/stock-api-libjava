@@ -250,7 +250,11 @@ public final class StockFile {
      * assets.
      */
     private Boolean mIsPremium;
-
+    /**
+     * True for editorial assets, false for non editorial.
+     * assets.
+     */
+    private Boolean mIsEditorial;
     /**
      * Contains available licenses for the media.
      */
@@ -785,6 +789,15 @@ public final class StockFile {
      */
     public Boolean getIsPremium() {
         return mIsPremium;
+    }
+
+    /**
+     * Checks if editorial asset.
+     *
+     * @return true for editorial assets and false for non editorial assets
+     */
+    public Boolean getIsEditorial() {
+        return mIsEditorial;
     }
 
     /**
@@ -1504,6 +1517,17 @@ public final class StockFile {
     @JsonSetter("is_premium")
     public void setIsPremium(final Boolean isPremium) {
         this.mIsPremium = isPremium;
+    }
+
+    /**
+     * Sets if editorial asset.
+     *
+     * @param isEditorial
+     *            true for editorial assets and false for non editorial assets
+     */
+    @JsonSetter("is_editorial")
+    public void setIsEditorial(final Boolean isEditorial) {
+        this.mIsEditorial = isEditorial;
     }
 
     /**
