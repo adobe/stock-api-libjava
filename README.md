@@ -548,7 +548,7 @@ public static void main(String args[]) {
     }
 ```
 #### License Response
-After calling various APIs in `License` class, reponse is returned in the form of `LicenseResponse`. It contains following fields. All class objects used in response are defined below.
+After calling various APIs in `License` class, response is returned in the form of `LicenseResponse`. It contains following fields. All class objects used in response are defined below.
 
 |Request Parameter| Getter Methods | Related Class     |Description|
 |---|---|---|---|
@@ -1011,7 +1011,7 @@ You can construct the object of this class with below arguments -
 * Returns:
      * `Entitlements` object that can be used to call its method `listEntitlements` and `selectEntitlement` for listing or selecting the entitlements respectively.
 
-##### Exmaple Code
+##### Example Code
 ``` Java
 public static void main(String args[]) {
         try {
@@ -1032,7 +1032,7 @@ public static void main(String args[]) {
 ```
 #### Methods
    * `listEntitlements` The method `listEntitlements` returns list of all entitlements for an account. It needs either user `access token` or `service token` and `entity refernce` for the providing response in the form of `EntitlementList` object containing the stock `user guid`, `creation date`, `list of organizations` and list of `entitlements` within the organizations.
-   * `selectEntitlement` It selects entitlement from the list of avaialble entitlements depending on the entitlementGuid, if entitlementGuid is not passsed, personal entitlement would be selected.
+   * `selectEntitlement` It selects entitlement from the list of available entitlements depending on the entitlementGuid, if entitlementGuid is not passsed, personal entitlement would be selected.
 
 #### Entitlement List Response
 After calling `listEntitlements` method in `Entitlements` api class, response is returned in the form of `EntitlementList`. It contains following fields. 
