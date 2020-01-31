@@ -30,7 +30,7 @@
         <maven.dependency.version>3.0.0</maven.dependency.version>
         <maven.javadoc.version>2.10.4</maven.javadoc.version>
         <project.info.reports.version>2.9</project.info.reports.version>
-        <checkstyle.version>6.19</checkstyle.version>
+        <checkstyle.version>8.29</checkstyle.version>
         <maven.checkstyle.version>2.17</maven.checkstyle.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
